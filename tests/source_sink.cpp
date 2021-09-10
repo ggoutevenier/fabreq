@@ -71,7 +71,7 @@ bool test_source_sink() {
 }
 
 TEST(SourceSink, TEST1) {
-//    EXPECT_TRUE(test_source_sink());
+    EXPECT_TRUE(test_source_sink());
 }
 
 

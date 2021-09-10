@@ -21,7 +21,7 @@ namespace fabreq {
         in.get(inV);
         while(inV.getTrans().get()) {
             outV = out.getFree();
-            if(!outV.getTrans().get()) {
+            if(outV.empty()) {
                 in.putBack(inV);
                 return false;
             }

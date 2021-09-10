@@ -4,6 +4,14 @@
 #include <memory>
 namespace fabreq {
 
+    /** 
+     * Source & Transation type container
+     * Container has two seperate unque_ptrs
+     * Source is the orinial sourced data (TODO make immutable)
+     * Trans is the transactional unique_ptr that can be modified
+     * The container is considered empty if there is no transactional pointer
+     * Swaping swaps both source and trans
+     */
     template<class S, class T=void>
     class pvalue_type {
     public:
@@ -31,10 +39,10 @@ namespace fabreq {
             return *this;
         }
 
-        pvalue_type<S,T> &operator=(pvalue_type<S,T> &a) {
-            swap(a);
-            return *this;
-        }
+//        pvalue_type<S,T> &operator=(pvalue_type<S,T> &a) {
+//            swap(a);
+//            return *this;
+//        }
 
         Source &getSource() {
             return source;
@@ -51,18 +59,19 @@ namespace fabreq {
         }
 
         void swap(pvalue_type<S,T> &a) {
-            this->source.swap(a.getSource());
-            this->trans.swap(a.getTrans());
+            source.swap(a.getSource());
+            if(!trans.get())
+                trans.swap(a.getTrans());
         }
 
         void reset() {
-            auto &s = getSource();
-            if(s.get())
-                s.reset();
+//            auto &s = getSource();
+            if(source.get())
+                source.reset();
 
-            auto &t = getTrans();
-            if(t.get())
-                t.reset();
+//            auto &t = getTrans();
+            if(trans.get())
+                trans.reset();
         }
 
         bool empty() {
@@ -73,6 +82,14 @@ namespace fabreq {
         Trans trans;      
     };
 
+    /**
+     * Source only type container
+     * 
+     * Holds unique_ptr to Source Type
+     * All operations only apply to the source
+     * setTrans is a noop function
+     * getTrans returns the source unique_ptr
+     */
     template<class S>
     class pvalue_type<S,void> {
     public:
@@ -90,6 +107,7 @@ namespace fabreq {
         }
 
         pvalue_type(): source(nullptr,[](S*){}){}
+ 
         pvalue_type(S *s, Deleter f) {
             Source(s, f).swap(source);
         }
@@ -103,10 +121,10 @@ namespace fabreq {
             return *this;
         }
 
-        pvalue_type<S> &operator=(pvalue_type<S> &a) {
-            swap(a);
-            return *this;
-        }
+//        pvalue_type<S> &operator=(pvalue_type<S> &a) {
+//            swap(a);
+//            return *this;
+//        }
 
         Source &getSource() {
             return source;
@@ -128,9 +146,9 @@ namespace fabreq {
         }
 
         void reset() {
-            auto &s = getSource();
-            if(s.get())
-                s.reset();
+//            auto &s = getSource();
+            if(source.get())
+                source.reset();
         }
         
         bool empty() {

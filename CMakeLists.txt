@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(my_project)
+project(fabreq)
+
+set(ENV{LD_LIBRARY_PATH} /usr/local/lib)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include") 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src") 
@@ -20,15 +22,20 @@ enable_testing()
 
 add_executable(
   fabrec_test
-  tests/source_sink.cpp 
-  tests/transform.cpp 
-  tests/distribute.cpp 
+#  tests/source_sink.cpp 
+#  tests/transform.cpp 
+#  tests/distribute.cpp 
+  tests/clone.cpp
+  tests/main.cpp
 )
 
 target_link_libraries(
   fabrec_test
-  gtest_main
+#  gtest_main
+  gtest
+  log4cxx
 )
 
 include(GoogleTest)
 gtest_discover_tests(fabrec_test)
+

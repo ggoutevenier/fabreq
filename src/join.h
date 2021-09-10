@@ -13,7 +13,6 @@ template<class Term, class Ins,class Out>
 class Join {
     using T = typename std::remove_reference_t<Out>::item_type;
     using Tuples = typename T::Trans::element_type;
-//    ShowType<TuplePtrs> dummy;
     std::mutex m_mutex;
     std::map<const void *, Tuples> m_outs;
 

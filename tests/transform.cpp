@@ -14,10 +14,6 @@ struct Input {
 
 struct Output {
     int v;
-/*    Output(int i):v(i) {};    
-    Output() = default;
-    Output(const Output &i) = default;
-    Output &operator=(const Output &a) = default;*/
 };
 
 bool test_transform() {
@@ -94,7 +90,7 @@ bool test_transform() {
 }
 
 TEST(Transform, TEST1) {
-//    EXPECT_TRUE(test_transform());
+    EXPECT_TRUE(test_transform());
 }
 
 

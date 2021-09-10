@@ -67,19 +67,22 @@ private:
     void process() {
         ptask_type ptask;
         bool isDone=false;
+        std::unique_lock<std::mutex> lock(m_mutex,std::defer_lock);
         for(;;) {
-            {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                if(m_tasks.empty())
-                    break;
-                ptask.swap(m_tasks.front());
-                assert(m_tasks.front().get()==0);
-                m_tasks.pop_front();
+            lock.lock();
+            if(m_tasks.empty()) {
+                lock.unlock();
+                break;
             }
+            ptask.swap(m_tasks.front());
+            assert(m_tasks.front().get()==0);
+            m_tasks.pop_front();
+            lock.unlock();
             isDone = ptask.get()->task();
             if(!isDone) {
-                std::lock_guard<std::mutex> lock(m_mutex);
+                lock.lock();
                 m_tasks.push_back(std::move(ptask));
+                lock.unlock();
                 assert(ptask.get()==0);
             }
             else {
