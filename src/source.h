@@ -12,9 +12,10 @@ namespace fabreq {
     template<class _Buffer, class _Func>
     class Source {
     public:
-        Source(_Buffer &out, _Func f, int size):m_out(out),m_func(f),m_size(size) {}
-        static auto create(_Buffer &out, _Func f, int size ) {
-            return std::make_shared<Source<_Buffer, _Func>>(out, f, size);
+        Source(_Buffer &out, _Func &&f, int size):m_out(out),m_func(std::forward<_Func>(f)),m_size(size) {}
+        ~Source() {}
+        static auto create(_Buffer &out, _Func &&f, int size ) {
+            return std::make_shared<Source<_Buffer, _Func>>(out, std::forward<_Func>(f), size);
         }
 
         bool operator()() noexcept {
@@ -39,22 +40,19 @@ namespace fabreq {
     auto &source(
         Context &context,
         std::string name,
-        F func,
-        //SourceStatus(*func)(S &), 
-        int max_buff=1,
-        int max_tasks=1
+        F &&func,
+        int max_buff=1
     ) {
         using B = Buffer<S>;
- //       using F = decltype(func);
 
         auto &out = context.buffer<B>(name);
-        auto source_ptr = Source<B,F>::create(out,func,max_buff);
+        auto source_ptr = Source<B,F>::create(out,std::forward<F>(func),max_buff);
 
         auto task = context.addTask(
                         name,
                         [source_ptr](){return (*source_ptr)();},
                         [source_ptr](){source_ptr->done();},
-                        max_tasks
+                        1
                     ); 
         out.addSource(task);
         return out;

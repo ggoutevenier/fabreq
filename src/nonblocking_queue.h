@@ -1,7 +1,6 @@
 #ifndef _nonblocking_queue_h
 #define _nonblocking_queue_h
 #include <deque>
-#include <memory>
 #include <mutex>
 
 namespace fabreq {

@@ -16,7 +16,7 @@ class ThreadPool {
     }
 
 public:
-    using task_type = std::function<bool()>;
+    using task_type = std::function<bool()>;//TODO noexcpt
     using callback_type = std::function<void()>;
     class Task {
         std::string name;
@@ -43,10 +43,10 @@ public:
         return t;
     }
 
-    void async_run(int n=1) {
+    void async_run(int n=std::thread::hardware_concurrency()) {
         n = min_max(n,0,256);
         for(int i=0;i<n;i++)
-            m_threads.emplace_back(std::bind(&ThreadPool::process,this));
+            m_threads.emplace_back([this](){this->process();});//std::bind(&ThreadPool::process,this));
     }
 
     void wait() {
@@ -54,7 +54,7 @@ public:
             thread.join();
     }
 
-    void run(int n=1) {
+    void run(int n = std::thread::hardware_concurrency()) {
         async_run(n-1);
         process();
         wait();

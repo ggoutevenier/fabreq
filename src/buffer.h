@@ -41,18 +41,6 @@ namespace fabreq {
     private:
         NonBlockingQueue<item_type> m_left,m_right;
 
-        template <typename> struct is_tuple: std::false_type {};
-        template <typename ...P> struct is_tuple<std::tuple<P...>>: std::true_type {};
-
-        template <typename P>
-        static void reset(std::unique_ptr<P> &p) {p.reset();}
-
-        template <typename P,typename D>
-        static void reset(std::unique_ptr<P,D> &p) {p.reset();}
-
-        template <typename P>
-        static void reset(P &p) {}
-
         template<class P>
         static void deleter_(NonBlockingQueue<item_type> &q, P *p) {
             if constexpr (is_tuple<P>::value) 

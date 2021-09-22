@@ -20,22 +20,28 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(
-  fabrec_test
+#add_executable(
+#  fabrec_test
 #  tests/source_sink.cpp 
 #  tests/transform.cpp 
 #  tests/distribute.cpp 
-  tests/clone.cpp
-  tests/main.cpp
+#  tests/clone.cpp
+#  tests/gtest.cpp
+#)
+add_executable(
+  presentation
+  presentation/main.cpp
 )
 
 target_link_libraries(
-  fabrec_test
+  presentation
+  pthread
+#  fabrec_test
 #  gtest_main
-  gtest
-  log4cxx
+#  gtest
+#  log4cxx
 )
 
-include(GoogleTest)
-gtest_discover_tests(fabrec_test)
+#include(GoogleTest)
+#gtest_discover_tests(fabrec_test)
 

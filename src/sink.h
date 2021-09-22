@@ -5,12 +5,10 @@
 #include <memory>
 
 namespace fabreq {
-//    enum class SinkStatus {OK=0, ERROR=1};
-
     template<class _Buffer, class _Func>
     class Sink {
     public:
-        Sink(_Buffer &in, _Buffer &err,_Func func) : m_in(in),m_err(err), m_func(func){}
+        Sink(_Buffer &in, _Buffer &err,_Func &&func) : m_in(in),m_err(err), m_func(std::forward<_Func>(func)){}
     
         static auto create(_Buffer &in, _Buffer &err, _Func f) {
             return std::make_shared<Sink<_Buffer, _Func>>(in, err, f);
@@ -25,6 +23,7 @@ namespace fabreq {
                 } catch(...) {
                     m_err.put(v);
                 }
+                v.getTrans().reset();
                 m_in.get(v);
             }
             return m_in.isDone();
@@ -42,18 +41,20 @@ namespace fabreq {
         Context &context,
         std::string name,
         _Buffer &in,
-        _Func func,
-        int n=1
+        _Func &&func
     ) {
         auto &err = context.buffer<_Buffer>(name+"-errors");
 
-        auto sink_ptr = Sink<std::remove_reference_t<decltype(in)>,decltype(func)>::create(in, err, func);        
+        auto sink_ptr = Sink<std::remove_reference_t<
+                                        decltype(in)>,
+                                        decltype(func)
+                                >::create(in, err, std::forward<_Func>(func));        
 
         auto task = context.addTask(
                     name,
                     [sink_ptr](){return (*sink_ptr)();},
-                    [sink_ptr](){sink_ptr->done();}
-                    ,n
+                    [sink_ptr](){sink_ptr->done();},
+                    1
                 );
                 
         in.addSink(task);
@@ -67,10 +68,9 @@ namespace fabreq {
         Context &context,
         std::string name,
         _Buffer &in,
-        _Func func,
-        int n=1
+        _Func &&func
     ) {
-        auto &err = sink(context,name,in,func,n);
+        auto &err = sink(context,name,in,std::forward<_Func>(func));
         err.done();
     }
 }

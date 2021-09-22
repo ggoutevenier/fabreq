@@ -46,6 +46,8 @@ namespace fabreq {
         return transform_tuple_(std::forward<Tuple>(tuple), std::forward<Func>(func), indices{});
     }
 
+    template <typename> struct is_tuple: std::false_type {};
+    template <typename ...P> struct is_tuple<std::tuple<P...>>: std::true_type {};
 
 }
 #endif

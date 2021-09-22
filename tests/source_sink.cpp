@@ -22,7 +22,7 @@ bool test_source_sink() {
                     v=seed.at(idx-1); 
                     return fabreq::SourceStatus::more_data;
                 },
-                10,1
+                10
             );
     
     std::vector<int> results;
@@ -41,7 +41,7 @@ bool test_source_sink() {
                             std::lock_guard<std::mutex> lock(mutex);
                             results.push_back(u);
                         }
-                    },4);
+                    });
 
     std::vector<int> errors;
     fabreq::sink_no_error(
@@ -55,9 +55,9 @@ bool test_source_sink() {
                 std::lock_guard<std::mutex> lock(mutex);
                 errors.push_back(u);
             }
-        },1);
+        });
 
-    cx.run(20);
+    cx.run(2);
 
     uint32_t u,v,e;
     u=0;
@@ -69,6 +69,8 @@ bool test_source_sink() {
     std::for_each(errors.begin(),errors.end(),[&e](auto &a) {e+=a;});
     return u==v+e && e==1;
 }
+
+
 
 TEST(SourceSink, TEST1) {
     EXPECT_TRUE(test_source_sink());

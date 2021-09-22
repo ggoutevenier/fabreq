@@ -5,14 +5,13 @@
 #include <memory>
 
 namespace fabreq {
-//    enum class TransformStatus {OK=0,ERROR=1};
     template<class In, class Out, class F>
-    class Transform {
-    public:     
-        Transform(In &in, In &err, Out &out, F f): in(in),err(err), out(out),f(f){}
-    
-        static auto create(In &in, In &err, Out &out, F f) {
-            return std::make_shared<Transform<In, Out, F>>(in, err, out, f);
+class Transform {
+public:     
+        Transform(In &in, In &err, Out &out, F &&f): in(in),err(err), out(out),f(std::forward<F>(f)){}
+        ~Transform(){}
+        static auto create(In &in, In &err, Out &out, F &&f) {
+            return std::make_shared<Transform<In, Out, F>>(in, err, out, std::forward<F>(f));
         }
 
     bool operator()() {    
@@ -27,13 +26,15 @@ namespace fabreq {
             }
             try {
                 f(*inV.getTrans().get(),*outV.getTrans().get());
-                typename In::item_type::Source &a = inV.getSource();
-                typename In::item_type::Source &b = outV.getSource();
+                auto &a = inV.getSource();
+                auto &b = outV.getSource();
                 a.swap(b);
                 out.put(outV);
             } catch(...) {
                 err.put(inV);
             }
+
+            inV.getTrans().reset();
             in.get(inV);
         }
         return in.isDone();
@@ -53,13 +54,13 @@ auto transform(
     Context &context,
     std::string name,
     In &in,
-    F func,
+    F &&func,
     int max_tasks=1
 ) {
     using Out = Buffer<typename In::item_type::Source::element_type,B>;
-    auto &out = context.buffer<Out>(name);
-    auto &err = context.buffer<In>(name);
-    auto transform_ptr = std::make_shared<Transform<In, Out, decltype(func)>>(in, err, out, func);
+    auto &out = context.buffer<Out>(name+"-out");
+    auto &err = context.buffer<In>(name+"-err");
+    auto transform_ptr = std::make_shared<Transform<In, Out, decltype(func)>>(in, err, out, std::forward<F>(func));
 
     auto task = context.addTask(
                         name,
