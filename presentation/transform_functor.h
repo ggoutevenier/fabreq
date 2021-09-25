@@ -7,11 +7,11 @@ extern std::mutex cout_mutex;
 
 namespace presentation {
 /*  simple UDF transform for demo*/
-class MultipleFunctor {
+class MultipleFunctor1 {
     const RefData &m_rate;
 public:
-    MultipleFunctor(const RefData &r):m_rate(r){}
-    MultipleFunctor(const MultipleFunctor &) = default;
+    MultipleFunctor1(const RefData &r):m_rate(r){}
+    MultipleFunctor1(const MultipleFunctor1 &) = default;
 
     void operator() (const Input &a, Output1 &b) const {
         if(a.getValue()==1)

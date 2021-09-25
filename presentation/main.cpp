@@ -31,12 +31,11 @@ void run_processes() {
     SourceFunctor source(generate_data(100));
 
     RefData refData(2);
-    MultipleFunctor transform1(refData);
+    MultipleFunctor1 transform1(refData);
     MultipleFunctor2 transform2(refData);
 
     struct Results {
-        std::vector<std::tuple<Input,Output1>> outputs1;
-        std::vector<std::tuple<Input,Output2>> outputs2;
+        std::vector<std::tuple<Input,Output2>> outputs;
         std::vector<Input> errors;
         double runtime;
         int output_total;
@@ -51,13 +50,14 @@ void run_processes() {
             source, 
             transform1, 
             transform2, 
-            SinkFunctor(serial_results.outputs2),
+            SinkFunctor(serial_results.outputs),
             SinkFunctor(serial_results.errors)
         );        
         auto end = std::chrono::high_resolution_clock::now();
         serial_results.runtime = std::chrono::duration<double,std::milli>(end-start).count();
     }
 
+// parallel run
     source.reset();
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -65,7 +65,7 @@ void run_processes() {
             source, 
             transform1, 
             transform2,  
-            SinkFunctor(parallel_results.outputs2), 
+            SinkFunctor(parallel_results.outputs), 
             SinkFunctor(parallel_results.errors)
         );
         auto end = std::chrono::high_resolution_clock::now();
@@ -73,9 +73,10 @@ void run_processes() {
 
     }
 
-    for(auto &v : parallel_results.outputs2) parallel_results.output_total+=std::get<1>(v).getValue();
+// agg results
+    for(auto &v : parallel_results.outputs) parallel_results.output_total+=std::get<1>(v).getValue();
     for(auto &v : parallel_results.errors) parallel_results.error_total+=v.getValue();
-    for(auto &v : serial_results.outputs2) serial_results.output_total+=std::get<1>(v).getValue();
+    for(auto &v : serial_results.outputs) serial_results.output_total+=std::get<1>(v).getValue();
     for(auto &v : serial_results.errors) serial_results.error_total+=v.getValue();
 
 #ifdef DEBUG
@@ -89,6 +90,7 @@ void run_processes() {
                 << parallel_results.output_total << ", "
                 << parallel_results.error_total << std::endl;
 #endif
+    new char; //force a memory leak 
 }
 }
 

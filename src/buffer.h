@@ -29,7 +29,6 @@ namespace fabreq {
         const std::string &getName() {return m_name;}
         bool hasSource() {return !m_source.expired();}
         bool hasSink() {return !m_sink.expired();}
-        virtual void clear() = 0;
         bool isDone() {return m_done;}
         void done() {m_done=true;}
     };
@@ -40,7 +39,7 @@ namespace fabreq {
         using item_type=pvalue_type<S,T>;
     private:
         NonBlockingQueue<item_type> m_left,m_right;
-
+        
         template<class P>
         static void deleter_(NonBlockingQueue<item_type> &q, P *p) {
             if constexpr (is_tuple<P>::value) 
@@ -50,14 +49,7 @@ namespace fabreq {
 
     public:
         Buffer(std::string name):BufferBase(name) {}
-        ~Buffer(){}
-
-        void clear() override {
-            item_type item;
-            get(item);
-            while(item.getSource().get()) {
-                get(item);
-            };
+        ~Buffer() override {
         }
 
         void put(item_type &item) {

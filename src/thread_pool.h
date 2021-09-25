@@ -19,7 +19,7 @@ public:
     using task_type = std::function<bool()>;//TODO noexcpt
     using callback_type = std::function<void()>;
     class Task {
-        std::string name;
+        std::string name;   
         callback_type dtor_callback;
     public:
         Task(std::string n,task_type t,callback_type c):name(n), task(t),dtor_callback(c){}
@@ -67,9 +67,8 @@ private:
     void process() {
         ptask_type ptask;
         bool isDone=false;
-        std::unique_lock<std::mutex> lock(m_mutex,std::defer_lock);
+        std::unique_lock<std::mutex> lock(m_mutex);
         for(;;) {
-            lock.lock();
             if(m_tasks.empty()) {
                 lock.unlock();
                 break;
@@ -79,10 +78,9 @@ private:
             m_tasks.pop_front();
             lock.unlock();
             isDone = ptask.get()->task();
+            lock.lock();
             if(!isDone) {
-                lock.lock();
                 m_tasks.push_back(std::move(ptask));
-                lock.unlock();
                 assert(ptask.get()==0);
             }
             else {

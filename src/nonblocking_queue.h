@@ -26,7 +26,9 @@ public:
         else
             item.reset();
     }
-
+//    typename std::deque<U>::iterator begin() {return m_container.begin();}
+//    typename std::deque<U>::iterator end() {return m_container.end();}
+    void clear() {m_container.clear();}    
 private:
     std::deque<U> m_container;
     std::mutex m_mutex;

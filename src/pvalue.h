@@ -34,15 +34,14 @@ namespace fabreq {
             Trans(new T(), f).swap(trans);
         }
 
+        ~pvalue_type() {
+            delete source.release();
+            delete trans.release();
+        }
         pvalue_type<S,T> &operator=(pvalue_type<S,T> &&a) {
             swap(a);
             return *this;
         }
-
-//        pvalue_type<S,T> &operator=(pvalue_type<S,T> &a) {
-//            swap(a);
-//            return *this;
-//        }
 
         Source &getSource() {
             return source;
@@ -65,11 +64,9 @@ namespace fabreq {
         }
 
         void reset() {
-//            auto &s = getSource();
             if(source.get())
                 source.reset();
 
-//            auto &t = getTrans();
             if(trans.get())
                 trans.reset();
         }
@@ -116,15 +113,13 @@ namespace fabreq {
             Source(new S(), f).swap(source);
         }
 
+        ~pvalue_type() {
+            delete source.release();        
+        }
         pvalue_type<S> &operator=(pvalue_type<S> &&a) {
             swap(a);
             return *this;
         }
-
-//        pvalue_type<S> &operator=(pvalue_type<S> &a) {
-//            swap(a);
-//            return *this;
-//        }
 
         Source &getSource() {
             return source;
@@ -146,7 +141,6 @@ namespace fabreq {
         }
 
         void reset() {
-//            auto &s = getSource();
             if(source.get())
                 source.reset();
         }
@@ -160,3 +154,4 @@ namespace fabreq {
     };
 }
 #endif
+    
