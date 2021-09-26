@@ -41,15 +41,15 @@ void process_parallel2(
     auto &in_buffer = fabreq::source<Input>(cx, "source", source, 20 /*buffer size*/);
     
     auto [error_buffer1, out_buffer1] = 
-            fabreq::transform<Output1>(cx, "transform1", in_buffer, trans1, 1 /* parallel degree */);
+            fabreq::transform<Output1>(cx, "transform1", in_buffer, trans1,  4/* parallel degree */);
 
     auto [error_buffer2, out_buffer2] = 
-            fabreq::transform<Output2>(cx, "transform2", out_buffer1, trans2, 1);
+            fabreq::transform<Output2>(cx, "transform2", out_buffer1, trans2, 4);
 
     fabreq::sink_no_error(cx, "sink", out_buffer2, sink);
     fabreq::sink_no_error(cx, "sink-err", error_buffer1, error);
 
-    cx.run(1);  // run on n threads
+    cx.run(4);  // run on n threads
 }
 }
 #endif

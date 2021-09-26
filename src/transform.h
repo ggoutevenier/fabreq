@@ -9,7 +9,11 @@ namespace fabreq {
 class Transform {
 public:     
         Transform(In &in, In &err, Out &out, F &&f): in(in),err(err), out(out),f(std::forward<F>(f)){}
-        ~Transform(){}
+        ~Transform(){
+            out.done();
+            err.done();
+        }
+
         static auto create(In &in, In &err, Out &out, F &&f) {
             return std::make_shared<Transform<In, Out, F>>(in, err, out, std::forward<F>(f));
         }
@@ -41,10 +45,6 @@ public:
         }
         return in.isDone();
     }
-    void done() {
-        out.done();
-        err.done();
-    }
 private:
     In &in, &err;
     Out &out;
@@ -67,7 +67,6 @@ auto transform(
     auto task = context.addTask(
                         name,
                         [transform_ptr](){return transform_ptr->operator()();},
-                        [transform_ptr](){transform_ptr->done();},
                         max_tasks
                     );
     in.addSink(task);

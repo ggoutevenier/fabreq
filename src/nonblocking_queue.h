@@ -7,7 +7,6 @@ namespace fabreq {
 template<class U>
 class NonBlockingQueue {
 public:
-    int size() {return m_container.size();}
     void push_back(U &&item) {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_container.emplace_back(std::move(item));
@@ -26,9 +25,6 @@ public:
         else
             item.reset();
     }
-//    typename std::deque<U>::iterator begin() {return m_container.begin();}
-//    typename std::deque<U>::iterator end() {return m_container.end();}
-//    void clear() {m_container.clear();}    
 private:
     std::deque<U> m_container;
     std::mutex m_mutex;

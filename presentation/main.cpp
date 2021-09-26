@@ -28,7 +28,7 @@ std::vector<Input> generate_data(int n) {
 }
 
 void run_processes() {
-    SourceFunctor source(generate_data(100));
+    SourceFunctor source(generate_data(10));
 
     RefData refData(2);
     MultipleFunctor1 transform1(refData);

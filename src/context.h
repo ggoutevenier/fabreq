@@ -11,15 +11,15 @@ namespace fabreq {
     class Context {
     public:   
         template<class _Buffer>
-        decltype(auto) buffer(std::string name) {
+        decltype(auto) buffer(std::string name,int size=0) {
             using B = typename std::remove_reference_t<_Buffer>;
-            m_buffers.push_back(std::make_unique<B>(name));
+            m_buffers.push_back(std::make_unique<B>(name, size));
             return static_cast<B&>(*m_buffers.back());
         }
 
-        template<class _Task, class _Callback>
-        auto addTask(std::string name, _Task task, _Callback callback, int max_tasks) {
-            return m_threads.addTask(name, task, callback, max_tasks);
+        template<class _Task>
+        auto addTask(std::string name, _Task task, int max_tasks) {
+            return m_threads.addTask(name, task, max_tasks);
         }
 
         void run(int n) {

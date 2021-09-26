@@ -9,7 +9,9 @@ namespace fabreq {
     class Sink {
     public:
         Sink(_Buffer &in, _Buffer &err,_Func &&func) : m_in(in),m_err(err), m_func(std::forward<_Func>(func)){}
-    
+        Sink() {
+            m_err.done();
+        }
         static auto create(_Buffer &in, _Buffer &err, _Func f) {
             return std::make_shared<Sink<_Buffer, _Func>>(in, err, f);
         }
@@ -28,9 +30,6 @@ namespace fabreq {
                 m_in.get(v);
             }
             return m_in.isDone();
-        }
-        void done() {
-            m_err.done();
         }
     private:
         _Buffer &m_in, &m_err;
@@ -54,7 +53,6 @@ namespace fabreq {
         auto task = context.addTask(
                     name,
                     [sink_ptr](){return (*sink_ptr)();},
-                    [sink_ptr](){sink_ptr->done();},
                     1
                 );
                 

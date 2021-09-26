@@ -53,7 +53,9 @@ public:
         Term& term,
         Ins ins,
         Out& out
-    ):term(term),ins(ins),out(out) {
+    ):term(term),ins(ins),out(out) {}
+    ~Join() {
+        out.done();
     }
     bool operator()() {
         bool done=true;
@@ -65,7 +67,6 @@ public:
         processTerm(term,done);
         return done;
     }
-    void done() {out.done();}
 private:
     Term& term;
     Ins ins;
@@ -102,7 +103,6 @@ private:
         auto p = context.addTask(
             name, 
             [f](){return f->operator()();},
-            [f](){f->done();},
             1
         ); 
 

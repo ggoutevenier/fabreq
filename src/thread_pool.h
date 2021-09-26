@@ -20,19 +20,27 @@ public:
     using callback_type = std::function<void()>;
     class Task {
         std::string name;   
-        callback_type dtor_callback;
+//        callback_type dtor_callback;
     public:
-        Task(std::string n,task_type t,callback_type c):name(n), task(t),dtor_callback(c){}
+//        Task(std::string n,task_type t,callback_type c):name(n), task(t),dtor_callback(c){}
+        Task(std::string n,task_type t):name(n), task(t){}
         ~Task() {
-            dtor_callback();
+//            dtor_callback();
         }
         task_type task;
     };
 
     std::weak_ptr<Task> addTask(std::string name, task_type task,int n=1) {
-        return addTask(name, task, [](){},n);
+        n = min_max(n,1,256);
+        auto t = std::make_shared<Task>(name, task);
+
+        for(int i =0;i<n;i++) {
+            m_tasks.push_back(t);
+        }
+
+        return t;
     }
-    std::weak_ptr<Task> addTask(std::string name, task_type task, callback_type completion, int n=1) {
+/*    std::weak_ptr<Task> addTask(std::string name, task_type task, callback_type completion, int n=1) {
         n = min_max(n,1,256);
         auto t = std::make_shared<Task>(name, task, completion);
 
@@ -41,7 +49,7 @@ public:
         }
 
         return t;
-    }
+    }*/
 
     void async_run(int n=std::thread::hardware_concurrency()) {
         n = min_max(n,0,256);

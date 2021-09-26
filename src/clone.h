@@ -12,7 +12,10 @@ namespace fabreq {
     class Clone {
         using item_type = typename _BufferIn::item_type;
     public:
-        Clone(_BufferIn &in, _BufferTupleOut outs, _BufferIn &term):m_in(in),m_outs(outs),m_proxy(term) { }    
+        Clone(_BufferIn &in, _BufferTupleOut outs, _BufferIn &term):m_in(in),m_outs(outs),m_proxy(term) { }
+        ~Clone() {
+            for_each(m_outs, [](auto &out) {out.done();});
+        }    
         static auto create(_BufferIn &in, _BufferTupleOut outs, _BufferIn &term) {
             return std::make_shared<Clone<_BufferIn, _BufferTupleOut>>(in, outs, term);
         }
@@ -38,9 +41,6 @@ namespace fabreq {
             return false;
         }
     
-        void done() {
-            for_each(m_outs, [](auto &out) {out.done();});
-        }
     private:
         _BufferIn &m_in;
         _BufferTupleOut m_outs;
@@ -72,9 +72,7 @@ namespace fabreq {
         auto task = context.addTask(
                             name,                         
                             [clone_ptr](){return clone_ptr->operator()();},
-                            [clone_ptr](){clone_ptr->done();
-                        }
-                        ,1); 
+                            1); 
 
         for_each(outs,[&task](auto &out) {out.addSource(task);});
         term.addSource(task);

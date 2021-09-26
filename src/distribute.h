@@ -22,7 +22,10 @@ namespace fabreq {
                 this->m_outs.push_back(out);
             });        
         }
-        ~Distribute(){}
+        ~Distribute(){
+            for(auto out : m_outs) out.second.get().done();
+        }
+
         static auto create(_BufferIn &in, _BufferTupleOut &outs) {
             return std::make_shared<Distribute<_BufferIn, _BufferTupleOut>>(in, outs);
         }
@@ -43,16 +46,11 @@ namespace fabreq {
             return false;
         }
 
-        void done() {
-            for(auto out : m_outs) out.second.get().done();
-        }
-
     private:
         _BufferIn &m_in;
         constexpr static auto Size = std::tuple_size_v<std::decay_t<_BufferTupleOut>>;
         using _Func = typename std::function<bool(const typename _BufferIn::item_type::Trans::element_type &)>;
         std::vector<std::pair<_Func,std::reference_wrapper<_BufferIn>>> m_outs;
-//        std::vector<std::tuple_element_t<0, _BufferTupleOut>> m_outs;
     };
 
     template<class B, class... Fs>
@@ -76,7 +74,6 @@ namespace fabreq {
         auto task = context.addTask(
                         name,
                         [distibute_ptr]() {return (*distibute_ptr)();},
-                        [distibute_ptr]() {distibute_ptr->done();},
                         1
                 );
 

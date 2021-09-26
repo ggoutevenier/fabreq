@@ -11,7 +11,9 @@ namespace fabreq {
     class Merge {
     public:
         Merge(_BufferInTuple& ins, _BufferOut &out):m_ins(ins),m_out(out) {}
-
+        ~Merge() {
+            m_out.done();
+        }
         static auto create(_BufferInTuple &ins, _BufferOut &out) {
             return std::make_shared<Merge<_BufferInTuple,_BufferOut>>(ins, out);
         }
@@ -30,7 +32,6 @@ namespace fabreq {
             });
             return done;
         }
-        void done() {m_out.done();}
     private:
         _BufferInTuple m_ins;
         _BufferOut &m_out;
@@ -49,7 +50,6 @@ namespace fabreq {
         auto merge_ptr = Merge<decltype(in_tuple),decltype(out)>::create(in_tuple,out);
         auto task = context.addTask(name,
                             [merge_ptr](){return (*merge_ptr)();},
-                            [merge_ptr](){merge_ptr->done();},
                             1
                         ); 
         for_each(in_tuple, [&task](auto &in) {in.addSink(task);});         

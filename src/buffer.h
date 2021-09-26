@@ -46,20 +46,22 @@ namespace fabreq {
                 for_each(*p,[](auto &a) {reset(a);});
             q.push_front(item_type(p, [&q](auto a) {deleter_(q,a);}));
         }
-
+        item_type alloc_item() {return item_type([this](auto p) {deleter_(this->m_left,p);});}
+        bool m_alloc;
     public:
-        Buffer(std::string name):BufferBase(name) {}
-        ~Buffer() override {
+        Buffer(std::string name,int size=0):BufferBase(name) {
+            if(size==0) {
+                m_alloc=true;
+            }
+            else {
+                m_alloc=false;
+                for(int i=0; i<size; i++) 
+                    alloc_item().reset();
+            }
         }
+        ~Buffer() override {}
 
         void put(item_type &item) {
-            if(isDone())
-                item.reset();
-            else
-                m_right.push_back(std::move(item));
-        }
-
-        void put(item_type &&item) {
             if(!isDone())
                 m_right.push_back(std::move(item));
         }
@@ -68,32 +70,21 @@ namespace fabreq {
             m_right.push_front(std::move(item));
         }
 
-        item_type getFree(std::atomic<int> &size) {
-            item_type p;
-            m_left.pop(p);
-            if(!p.empty())
-                return p;
-            
-            if(size>0 && size.fetch_sub(1)>0) {
-               return item_type([this](auto p) {deleter_(this->m_left,p);});
-            }
-
-            return item_type();
-        }
-
         item_type getFree() {
             item_type p;
             m_left.pop(p);
+            
             if(!p.empty())
                 return p;
-            
-            return item_type([this](auto p) {deleter_(this->m_left,p);});
+            else if(m_alloc)
+                return alloc_item();
+            else
+                return item_type();
         }
 
         void get(item_type &item) {
             m_right.pop(item);
         }
-
     };
 }
 #endif
