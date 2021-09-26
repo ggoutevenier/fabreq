@@ -32,6 +32,8 @@ public:
                 out.put(outV);
             } catch(...) {
                 err.put(inV);
+                // call trans deleter to put back on free Q
+                outV.getTrans().reset();  
             }
 
             inV.getTrans().reset();

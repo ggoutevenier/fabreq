@@ -35,8 +35,10 @@ namespace fabreq {
         }
 
         ~pvalue_type() {
-            delete source.release();
-            delete trans.release();
+            if(source.get())
+                delete source.release();
+            if(trans.get())
+                delete trans.release();
         }
         pvalue_type<S,T> &operator=(pvalue_type<S,T> &&a) {
             swap(a);
@@ -114,7 +116,8 @@ namespace fabreq {
         }
 
         ~pvalue_type() {
-            delete source.release();        
+            if(source.get())
+                delete source.release();        
         }
         pvalue_type<S> &operator=(pvalue_type<S> &&a) {
             swap(a);

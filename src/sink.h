@@ -24,6 +24,7 @@ namespace fabreq {
                     m_err.put(v);
                 }
                 v.getTrans().reset();
+                v.getSource().reset();
                 m_in.get(v);
             }
             return m_in.isDone();

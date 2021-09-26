@@ -22,8 +22,10 @@ namespace fabreq {
             for(;;) {
                 auto item = m_out.getFree(m_size);
                 if(item.empty()) break;
-                if(m_func(*item.getSource())==SourceStatus::no_more_data) 
+                if(m_func(*item.getSource())==SourceStatus::no_more_data) {
+                    item.getSource().reset();
                     return true;
+                }
                 m_out.put(item);
             }
             return false;
@@ -51,9 +53,10 @@ namespace fabreq {
         auto task = context.addTask(
                         name,
                         [source_ptr](){return (*source_ptr)();},
-                        [source_ptr](){source_ptr->done();},
+                        [ptr = source_ptr.get()](){ptr->done();},
                         1
                     ); 
+
         out.addSource(task);
         return out;
     }
