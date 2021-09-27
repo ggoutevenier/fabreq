@@ -11,7 +11,7 @@ class MultipleFunctor1 {
     const RefData &m_rate;
 public:
     MultipleFunctor1(const RefData &r):m_rate(r){}
-    MultipleFunctor1(const MultipleFunctor1 &) = default;
+//    MultipleFunctor1(const MultipleFunctor1 &) = default;
 
     void operator() (const Input &a, Output1 &b) const {
         if(a.getValue()==1)

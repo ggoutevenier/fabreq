@@ -28,12 +28,13 @@ std::vector<Input> generate_data(int n) {
 }
 
 void run_processes() {
-    SourceFunctor source(generate_data(10));
+    SourceFunctor source(generate_data(10));  // populates vector with values 1-10
 
-    RefData refData(2);
+    RefData refData(2); // greates a rate of 2
     MultipleFunctor1 transform1(refData);
     MultipleFunctor2 transform2(refData);
 
+// structures to hold output data
     struct Results {
         std::vector<std::tuple<Input,Output2>> outputs;
         std::vector<Input> errors;
@@ -90,13 +91,14 @@ void run_processes() {
                 << parallel_results.output_total << ", "
                 << parallel_results.error_total << std::endl;
 #endif
-    new char; //force a memory leak 
 }
 }
 
 int main(int argc, char **argv) {
     presentation::run_processes();
-
+#ifdef DEBUG
+    new char; //force a memory leak 
+#endif
     return 0;
 }
 

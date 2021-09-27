@@ -12,7 +12,7 @@ public:
         reset();
     }
 
-    SourceFunctor(SourceFunctor &&sf):m_data(std::move(sf.m_seed)), m_it(sf.m_it) {}
+//    SourceFunctor(SourceFunctor &&sf):m_data(std::move(sf.m_seed)), m_it(sf.m_it) {}
     ~SourceFunctor(){}
     fabreq::SourceStatus operator()(typename T::value_type &v) {
         if(m_it == m_data.end()) 

@@ -17,16 +17,11 @@ class ThreadPool {
 
 public:
     using task_type = std::function<bool()>;//TODO noexcpt
-    using callback_type = std::function<void()>;
     class Task {
         std::string name;   
-//        callback_type dtor_callback;
     public:
-//        Task(std::string n,task_type t,callback_type c):name(n), task(t),dtor_callback(c){}
         Task(std::string n,task_type t):name(n), task(t){}
-        ~Task() {
-//            dtor_callback();
-        }
+        ~Task() {}
         task_type task;
     };
 
@@ -40,21 +35,11 @@ public:
 
         return t;
     }
-/*    std::weak_ptr<Task> addTask(std::string name, task_type task, callback_type completion, int n=1) {
-        n = min_max(n,1,256);
-        auto t = std::make_shared<Task>(name, task, completion);
-
-        for(int i =0;i<n;i++) {
-            m_tasks.push_back(t);
-        }
-
-        return t;
-    }*/
 
     void async_run(int n=std::thread::hardware_concurrency()) {
         n = min_max(n,0,256);
         for(int i=0;i<n;i++)
-            m_threads.emplace_back([this](){this->process();});//std::bind(&ThreadPool::process,this));
+            m_threads.emplace_back([this](){this->process();});
     }
 
     void wait() {

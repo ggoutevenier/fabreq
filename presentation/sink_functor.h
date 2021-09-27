@@ -8,7 +8,7 @@ class SinkFunctor {
     T *m_ptr;
 public:
     SinkFunctor(T &r):m_ptr(&r) {}
-    SinkFunctor(SinkFunctor &&) = default;
+//    SinkFunctor(SinkFunctor &&) = default;
     ~SinkFunctor(){}
 
     template<class A,class B>

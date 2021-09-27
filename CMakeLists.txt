@@ -10,7 +10,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
 
-#set(CMAKE_CXX_FLAGS "-fsanitize=address  -fsanitize=leak -g")
+set(CMAKE_CXX_FLAGS "-fsanitize=address  -fsanitize=leak -g")
 #CMAKE_EXE_LINKER_FLAGS:STRING=-fsanitize=address  -fsanitize=leak
 #CMAKE_MODULE_LINKER_FLAGS:STRING=-fsanitize=address  -fsanitize=leak
 
