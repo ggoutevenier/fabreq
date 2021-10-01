@@ -1,7 +1,6 @@
 #ifndef _tuple_helper_h
 #define _tuple_helper_h
 #include <tuple>
-#include "tuple_helper.h"
 
 namespace fabreq {
     template<typename T>
