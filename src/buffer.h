@@ -49,16 +49,12 @@ namespace fabreq {
         item_type alloc_item() {return item_type([this](auto p) {deleter_(this->m_left,p);});}
         bool m_alloc;
     public:
-        Buffer(std::string name,int size=0):BufferBase(name) {
-            if(size==0) {
-                m_alloc=true;
-            }
-            else {
-                m_alloc=false;
-                for(int i=0; i<size; i++) 
-                    alloc_item().reset();
-            }
+        Buffer(std::string name,size_t size=0):BufferBase(name),m_left(size),m_alloc(size==0) {
+//            for(auto &v : m_left) alloc_item().swap(v);
+            for_each(m_left.begin(), m_left.end(), [this](auto &v){this->alloc_item().swap(v);});
         }
+        
+
         ~Buffer() override {}
 
         void put(item_type &item) {
